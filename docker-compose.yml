@@ -1,11 +1,11 @@
 networks:
-  app_net_automation_backups:
+  app_net_invoice:
     external: false
 
 services:
-  
+
   db:
-    container_name: db_automation_backups
+    container_name: db_invoice
     image: postgres
     shm_size: 128mb
     environment:
@@ -13,11 +13,11 @@ services:
     ports:
       - 5433:5432
     volumes:
-      - db:/db/postgres/db_automation
+      - db:/db/postgres/db_invoice
     networks:
-      app_net_automation_backups:
+      app_net_invoice:
         aliases:
-          - app_automation
+          - app_invoice
 
 volumes:
   db:

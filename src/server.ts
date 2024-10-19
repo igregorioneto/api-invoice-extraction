@@ -1,6 +1,7 @@
 import express, { json, urlencoded } from "express";
 import cors from "cors";
 import { setupSwagger } from "./swagger";
+import invoiceRouter from "./app/routes/invoiceRoutes";
 
 const createServer = () => {
   const app = express();
@@ -12,6 +13,7 @@ const createServer = () => {
   app.use(urlencoded({ extended: true }));
 
   // Routes
+  app.use('/invoices', invoiceRouter);
 
   setupSwagger(app);
 
