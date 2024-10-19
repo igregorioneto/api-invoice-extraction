@@ -5,13 +5,39 @@ import { ExtractInvoiceService } from "../../invoice/domain/services/ExtractInvo
 import { upload } from "../../shared/utils/multer";
 import { FindAllInvoiceService } from "../../invoice/domain/services/FindAllInvoiceService";
 import { FindByIdInvoiceService } from "../../invoice/domain/services/FindByIdInvoiceService";
+import { CreateClientService } from "../../client/domain/services/CreateClientService";
+import { PrismaClientRepository } from "../../client/infra/repositories/PrismaClientRepository";
+import { PrismaAddressRepository } from "../../address/infra/repositories/PrismaAddressRepository";
+import { FindByIdClientService } from "../../client/domain/services/FindByIdClientService";
+import { CreateAddressService } from "../../address/domain/services/CreateAddressService";
+import { FindByIdAddressService } from "../../address/domain/services/FindByIdAddressService";
 
 const router = Router();
 
 const prismaInviteRepository = new PrismaInvoiceRepository();
-const extractInvoiceService = new ExtractInvoiceService(
-  prismaInviteRepository
+const prismaClientRepository = new PrismaClientRepository();
+const prismaAddressRepository = new PrismaAddressRepository();
+const createClientService = new CreateClientService(
+  prismaClientRepository
 );
+const findByIdClientService = new FindByIdClientService(
+  prismaClientRepository
+);
+const createAddressService = new CreateAddressService(
+  prismaAddressRepository
+);
+const findByIdAddressService = new FindByIdAddressService(
+  prismaAddressRepository
+);
+
+const extractInvoiceService = new ExtractInvoiceService(
+  prismaInviteRepository,
+  createClientService,
+  findByIdClientService,
+  createAddressService,
+  findByIdAddressService
+);
+
 const findAllInvoiceService = new FindAllInvoiceService(
   prismaInviteRepository
 );
