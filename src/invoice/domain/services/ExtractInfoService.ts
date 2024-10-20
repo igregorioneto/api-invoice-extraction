@@ -2,50 +2,101 @@ export class ExtractInfoService {
   constructor( ) { }
 
   async execute(text: string) {
-    console.log(text);
     const itemsInvoice = /Itens da Fatura\s*([\s\S]*?)Tipo de Medição/;
     const informacoesClienteRegex = /Código de Débito\s*([\s\S]*?)Referente a/;
 
     // Client Extract Info
     let clientInfo = informacoesClienteRegex.exec(text);
     const clientData = clientInfo ? clientInfo[1].split('\n') : [];
-    const clientDataValue = clientData[3].includes('ATENÇÃO') ? clientData[5] : clientData[3];
-    const regexNameClient = /^(.*?)\s+(\d+)$/;
-    const resultNameClient = regexNameClient.exec(clientDataValue);
-    let name = clientData[3].includes('ATENÇÃO') ? clientDataValue : '';
-    let document = '';
-    if (resultNameClient && name === '') {
-      name = resultNameClient[1];
-      document = resultNameClient[2] || '';
-    }
-    let numberClient = clientData[10].split(' ')[2] || ''
+    let clientDataValue;
+    let regexNameClient,
+      resultNameClient,
+      regexStreetAndNumber,
+      resultStreetAndNumber,
+      regexCepCityState,
+      resultCepCityState,
+      regexMonthAndYear,
+      resultMonthAndYear;
 
-    let district = clientData[5];
-
-    // Extract Address Info
-    const regexStreetAndNumber = /^(.*?)\s+(\d+)\s+(.*)$/;
-    const resultStreetAndNumber = regexStreetAndNumber.exec(clientData[4]);
-    let street = '', number = '';
-    if (resultStreetAndNumber) {
-      street = resultStreetAndNumber[1];
-      number = resultStreetAndNumber[2];
-    }
-
-    const regexCepCityState = /^(\d{5}-\d{3})\s+(.+?),\s+([A-Z]{2})$/;
-    const resultCepCityState = regexCepCityState.exec(clientData[6]);
+    let numberClient, district;
     let cep = '', city = '', state = '';
-    if (resultCepCityState) {
-      cep = resultCepCityState[1];
-      city = resultCepCityState[2];
-      state = resultCepCityState[3];
-    }
-
-    // Extract Invoice Info
-    const regexMonthAndYear = /(\w+)\/(\d{4})/;
-    const resultMonthAndYear = regexMonthAndYear.exec(clientData[2]);
+    let name = '';
+    let document = '';
+    let street = '', number = '';
     let monthReference = '';
-    if (resultMonthAndYear) {
-      monthReference = resultMonthAndYear[0];
+
+    if (!clientData[3].includes('ATENÇÃO')) {
+      clientDataValue = clientData[3];
+      regexNameClient = /^(.*?)\s+(\d+)$/;
+      resultNameClient = regexNameClient.exec(clientData[3]);
+      if (resultNameClient && name === '') {
+        name = resultNameClient[1];
+        document = resultNameClient[2] || '';
+      }
+      numberClient = clientData[10].split(' ')[2] || ''
+
+      district = clientData[5];
+
+      // Extract Address Info
+      regexStreetAndNumber = /^(.*?)\s+(\d+)\s+(.*)$/;
+      resultStreetAndNumber = regexStreetAndNumber.exec(clientData[4]);
+      let street = '', number = '';
+      if (resultStreetAndNumber) {
+        street = resultStreetAndNumber[1];
+        number = resultStreetAndNumber[2];
+      }
+
+      regexCepCityState = /^(\d{5}-\d{3})\s+(.+?),\s+([A-Z]{2})$/;
+      resultCepCityState = regexCepCityState.exec(clientData[6]);
+
+      if (resultCepCityState) {
+        cep = resultCepCityState[1];
+        city = resultCepCityState[2];
+        state = resultCepCityState[3];
+      }
+
+      // Extract Invoice Info
+      regexMonthAndYear = /(\w+)\/(\d{4})/;
+      resultMonthAndYear = regexMonthAndYear.exec(clientData[2]);
+      let monthReference = '';
+      if (resultMonthAndYear) {
+        monthReference = resultMonthAndYear[0];
+      }
+    } else {
+      clientDataValue = clientData[5];
+      regexNameClient = /^(.*?)\s+(\d+)$/;
+      resultNameClient = regexNameClient.exec(clientData[5]);
+      name = clientData[5];
+      document = clientData[9];
+      numberClient = clientData[11].split(' ')[2] || '';
+
+      district = clientData[7];
+
+      // Extract Address Info
+      regexStreetAndNumber = /^(.*?)\s+(\d+)\s+(.*)$/;
+      resultStreetAndNumber = regexStreetAndNumber.exec(clientData[6]);
+
+      if (resultStreetAndNumber) {
+        street = resultStreetAndNumber[1];
+        number = resultStreetAndNumber[2];
+      }
+
+      regexCepCityState = /^(\d{5}-\d{3})\s+(.+?),\s+([A-Z]{2})$/;
+      resultCepCityState = regexCepCityState.exec(clientData[8]);
+
+      if (resultCepCityState) {
+        cep = resultCepCityState[1];
+        city = resultCepCityState[2];
+        state = resultCepCityState[3];
+      }
+
+      // Extract Invoice Info
+      regexMonthAndYear = /(\w+)\/(\d{4})/;
+      resultMonthAndYear = regexMonthAndYear.exec(clientData[2]);
+
+      if (resultMonthAndYear) {
+        monthReference = resultMonthAndYear[0];
+      }
     }
 
     let invoiceInfo = itemsInvoice.exec(text) || '';
