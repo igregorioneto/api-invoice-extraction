@@ -1,7 +1,7 @@
 import { BaseEntity } from "../../../shared/domain/entities/BaseEntity";
 
 export class Invoice extends BaseEntity {
-  monthReference: Date;
+  monthReference: string;
   eletricalEnergyQuantity: number;
   eletricalEnergyAmount: number;
   energySCEEEICMSQuantity: number;
@@ -13,7 +13,7 @@ export class Invoice extends BaseEntity {
 
   constructor(params: {
     id?: string;
-    monthReference: Date;
+    monthReference: string;
     eletricalEnergyQuantity: number;
     eletricalEnergyAmount: number;
     energySCEEEICMSQuantity: number;

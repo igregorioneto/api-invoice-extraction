@@ -34,7 +34,7 @@ model Address {
 
 model Invoice {
   id                              String  @unique  @default(uuid())
-  monthReference                  DateTime
+  monthReference                  String
   eletricalEnergyQuantity         Int
   eletricalEnergyAmount           Int
   energySCEEEICMSQuantity         Int

@@ -11,6 +11,8 @@ import { PrismaAddressRepository } from "../../address/infra/repositories/Prisma
 import { FindByIdClientService } from "../../client/domain/services/FindByIdClientService";
 import { CreateAddressService } from "../../address/domain/services/CreateAddressService";
 import { FindByIdAddressService } from "../../address/domain/services/FindByIdAddressService";
+import { FindByNumberClientService } from "../../client/domain/services/FindByNumberClientService";
+import { ExtractInfoService } from "../../invoice/domain/services/ExtractInfoService";
 
 const router = Router();
 
@@ -23,6 +25,9 @@ const createClientService = new CreateClientService(
 const findByIdClientService = new FindByIdClientService(
   prismaClientRepository
 );
+const findByNumberClientService = new FindByNumberClientService(
+  prismaClientRepository
+);
 const createAddressService = new CreateAddressService(
   prismaAddressRepository
 );
@@ -30,12 +35,16 @@ const findByIdAddressService = new FindByIdAddressService(
   prismaAddressRepository
 );
 
+const extractInfoService = new ExtractInfoService();
+
 const extractInvoiceService = new ExtractInvoiceService(
   prismaInviteRepository,
   createClientService,
   findByIdClientService,
+  findByNumberClientService,
   createAddressService,
-  findByIdAddressService
+  findByIdAddressService,
+  extractInfoService
 );
 
 const findAllInvoiceService = new FindAllInvoiceService(

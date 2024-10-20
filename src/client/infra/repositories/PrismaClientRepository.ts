@@ -14,4 +14,7 @@ export class PrismaClientRepository implements ClientRepository {
     return await prisma.client.findUnique({ where: { id } });
   }
 
+  async findByNumberClient(numberClient: string): Promise<Client | null> {
+    return await prisma.client.findFirst({ where: { numberClient } });
+  }
 }
