@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Client {
-  id                              String  @unique  @default(uuid())
+  id                              String  @unique
   name                            String
   document                        String
   numberClient                    String
@@ -18,7 +18,7 @@ model Client {
 }
 
 model Address {
-  id                              String  @unique  @default(uuid())
+  id                              String  @unique
   street                          String
   number                          String
   district                        String
@@ -33,15 +33,15 @@ model Address {
 }
 
 model Invoice {
-  id                              String  @unique  @default(uuid())
+  id                              String  @unique
   monthReference                  String
-  eletricalEnergyQuantity         Int
-  eletricalEnergyAmount           Int
-  energySCEEEICMSQuantity         Int
-  energySCEEEICMSAmount           Int
-  compensatedEnergyQuantity       Int
-  compensatedEnergyAmount         Int
-  publicLightingContribution      Int
+  eletricalEnergyQuantity         String
+  eletricalEnergyAmount           String
+  energySCEEEICMSQuantity         String
+  energySCEEEICMSAmount           String
+  compensatedEnergyQuantity       String
+  compensatedEnergyAmount         String
+  publicLightingContribution      String
   addressId                       String
   address                         Address   @relation(fields: [addressId], references: [id])
   createdAt                       DateTime  @default(now())

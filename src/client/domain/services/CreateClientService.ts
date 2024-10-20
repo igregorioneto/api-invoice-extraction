@@ -6,6 +6,6 @@ export class CreateClientService {
   constructor(private readonly clientRepository: ClientRepository) { }
 
   async execute(client: Client) {
-    await this.clientRepository.create(client);
+    return await this.clientRepository.create(client);
   }
 }

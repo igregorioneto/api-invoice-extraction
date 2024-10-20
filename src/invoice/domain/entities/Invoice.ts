@@ -2,25 +2,25 @@ import { BaseEntity } from "../../../shared/domain/entities/BaseEntity";
 
 export class Invoice extends BaseEntity {
   monthReference: string;
-  eletricalEnergyQuantity: number;
-  eletricalEnergyAmount: number;
-  energySCEEEICMSQuantity: number;
-  energySCEEEICMSAmount: number;
-  compensatedEnergyQuantity: number;
-  compensatedEnergyAmount: number;
-  publicLightingContribution: number;
+  eletricalEnergyQuantity: string;
+  eletricalEnergyAmount: string;
+  energySCEEEICMSQuantity: string;
+  energySCEEEICMSAmount: string;
+  compensatedEnergyQuantity: string;
+  compensatedEnergyAmount: string;
+  publicLightingContribution: string;
   addressId: string;
 
   constructor(params: {
     id?: string;
     monthReference: string;
-    eletricalEnergyQuantity: number;
-    eletricalEnergyAmount: number;
-    energySCEEEICMSQuantity: number;
-    energySCEEEICMSAmount: number;
-    compensatedEnergyQuantity: number;
-    compensatedEnergyAmount: number;
-    publicLightingContribution: number;
+    eletricalEnergyQuantity: string;
+    eletricalEnergyAmount: string;
+    energySCEEEICMSQuantity: string;
+    energySCEEEICMSAmount: string;
+    compensatedEnergyQuantity: string;
+    compensatedEnergyAmount: string;
+    publicLightingContribution: string;
     addressId: string;
     createdAt?: Date;
     updatedAt?: Date;

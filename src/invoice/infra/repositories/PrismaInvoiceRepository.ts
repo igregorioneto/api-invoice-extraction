@@ -11,7 +11,15 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
   }
 
   async findAll(): Promise<Invoice[]> {
-    return await prisma.invoice.findMany();
+    return await prisma.invoice.findMany({
+      include: {
+        address: {
+          include: {
+            client: true
+          }
+        }
+      }
+    });
   }
 
   async findById(id: string): Promise<Invoice | null> {

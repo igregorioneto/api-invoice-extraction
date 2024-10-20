@@ -6,6 +6,6 @@ export class CreateAddressService {
   constructor(private readonly addressRepository: AddressRepository) { }
 
   async execute(address: Address) {
-    await this.addressRepository.create(address);
+    return await this.addressRepository.create(address);
   }
 }

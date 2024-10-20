@@ -2,19 +2,21 @@ export class ExtractInfoService {
   constructor( ) { }
 
   async execute(text: string) {
+    console.log(text);
     const itemsInvoice = /Itens da Fatura\s*([\s\S]*?)Tipo de Medição/;
-    const informacoesClienteRegex = /Código de Débito Automático\s*([\s\S]*?)Referente a/;
+    const informacoesClienteRegex = /Código de Débito\s*([\s\S]*?)Referente a/;
 
     // Client Extract Info
     let clientInfo = informacoesClienteRegex.exec(text);
     const clientData = clientInfo ? clientInfo[1].split('\n') : [];
+    const clientDataValue = clientData[3].includes('ATENÇÃO') ? clientData[5] : clientData[3];
     const regexNameClient = /^(.*?)\s+(\d+)$/;
-    const resultNameClient = regexNameClient.exec(clientData[3]);
-    let name = '';
+    const resultNameClient = regexNameClient.exec(clientDataValue);
+    let name = clientData[3].includes('ATENÇÃO') ? clientDataValue : '';
     let document = '';
-    if (resultNameClient) {
+    if (resultNameClient && name === '') {
       name = resultNameClient[1];
-      document = resultNameClient[2];
+      document = resultNameClient[2] || '';
     }
     let numberClient = clientData[10].split(' ')[2] || ''
 
