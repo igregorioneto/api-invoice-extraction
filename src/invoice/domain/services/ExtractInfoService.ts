@@ -5,141 +5,35 @@ export class ExtractInfoService {
     const itemsInvoice = /Itens da Fatura\s*([\s\S]*?)Tipo de Medição/;
     const informacoesClienteRegex = /Código de Débito\s*([\s\S]*?)Referente a/;
 
-    // Client Extract Info
-    let clientInfo = informacoesClienteRegex.exec(text);
+    // Extrair informações do cliente
+    const clientData = this.extractClientInfo(text,informacoesClienteRegex);
+    // Extrair informações da fatura
+    const invoiceData = this.extractInvoiceInfo(text, itemsInvoice);
+
+    return {
+      client:clientData,
+      invoice:invoiceData,
+      address: clientData.address
+    }
+  }
+
+  private extractClientInfo(text: string, regex: RegExp) {
+    let clientInfo = regex.exec(text);
     const clientData = clientInfo ? clientInfo[1].split('\n') : [];
-    let clientDataValue;
-    let regexNameClient,
-      resultNameClient,
-      regexStreetAndNumber,
-      resultStreetAndNumber,
-      regexCepCityState,
-      resultCepCityState,
-      regexMonthAndYear,
-      resultMonthAndYear;
 
-    let numberClient, district;
-    let cep = '', city = '', state = '';
-    let name = '';
-    let document = '';
-    let street = '', number = '';
-    let monthReference = '';
+    let numberClient = '', district = '' , cep = '', city = '', state = '';
+    let name = '', document = '',street = '', number = '', monthReference = '';
 
-    if (!clientData[3].includes('ATENÇÃO')) {
-      clientDataValue = clientData[3];
-      regexNameClient = /^(.*?)\s+(\d+)$/;
-      resultNameClient = regexNameClient.exec(clientData[3]);
-      if (resultNameClient && name === '') {
-        name = resultNameClient[1];
-        document = resultNameClient[2] || '';
-      }
-      numberClient = clientData[10].split(' ')[2] || ''
-
-      district = clientData[5];
-
-      // Extract Address Info
-      regexStreetAndNumber = /^(.*?)\s+(\d+)\s+(.*)$/;
-      resultStreetAndNumber = regexStreetAndNumber.exec(clientData[4]);
-      let street = '', number = '';
-      if (resultStreetAndNumber) {
-        street = resultStreetAndNumber[1];
-        number = resultStreetAndNumber[2];
-      }
-
-      regexCepCityState = /^(\d{5}-\d{3})\s+(.+?),\s+([A-Z]{2})$/;
-      resultCepCityState = regexCepCityState.exec(clientData[6]);
-
-      if (resultCepCityState) {
-        cep = resultCepCityState[1];
-        city = resultCepCityState[2];
-        state = resultCepCityState[3];
-      }
-
-      // Extract Invoice Info
-      regexMonthAndYear = /(\w+)\/(\d{4})/;
-      resultMonthAndYear = regexMonthAndYear.exec(clientData[2]);
-      let monthReference = '';
-      if (resultMonthAndYear) {
-        monthReference = resultMonthAndYear[0];
-      }
+    if (clientData.length > 3 && !clientData[3].includes('ATENÇÃO')) {
+      ({ name, document, numberClient, street, number, district, city, state, cep, monthReference } = this.extractClientDetails(clientData, 3));
     } else {
-      clientDataValue = clientData[5];
-      regexNameClient = /^(.*?)\s+(\d+)$/;
-      resultNameClient = regexNameClient.exec(clientData[5]);
-      name = clientData[5];
-      document = clientData[9];
-      numberClient = clientData[11].split(' ')[2] || '';
-
-      district = clientData[7];
-
-      // Extract Address Info
-      regexStreetAndNumber = /^(.*?)\s+(\d+)\s+(.*)$/;
-      resultStreetAndNumber = regexStreetAndNumber.exec(clientData[6]);
-
-      if (resultStreetAndNumber) {
-        street = resultStreetAndNumber[1];
-        number = resultStreetAndNumber[2];
-      }
-
-      regexCepCityState = /^(\d{5}-\d{3})\s+(.+?),\s+([A-Z]{2})$/;
-      resultCepCityState = regexCepCityState.exec(clientData[8]);
-
-      if (resultCepCityState) {
-        cep = resultCepCityState[1];
-        city = resultCepCityState[2];
-        state = resultCepCityState[3];
-      }
-
-      // Extract Invoice Info
-      regexMonthAndYear = /(\w+)\/(\d{4})/;
-      resultMonthAndYear = regexMonthAndYear.exec(clientData[2]);
-
-      if (resultMonthAndYear) {
-        monthReference = resultMonthAndYear[0];
-      }
-    }
-
-    let invoiceInfo = itemsInvoice.exec(text) || '';
-    const energiaEletricaRegex = /Energia Elétrica\s*([\s\S]*?)Energia SCEE s/;
-    const energiaSCEERegex = /Energia SCEE s\/ ICMS\s*([\s\S]*?)Energia compensada/;
-    const energiaCompensadaRegex = /Energia compensada GD I\s*([\s\S]*?)Contrib Ilum Publica Municipa/;
-    const contribuicaoIlumPublicaRegex = /Contrib Ilum Publica Municipal\s*([\s\S]*?)TOTAL/;
-
-    let eletricalEnergyQuantity = '', eletricalEnergyAmount = '',
-    energySCEEEICMSQuantity = '', energySCEEEICMSAmount = '',
-    compensatedEnergyQuantity = '', compensatedEnergyAmount = '',
-    publicLightingContribution = '';
-
-    const resultEnergiaEletricaRex = energiaEletricaRegex.exec(invoiceInfo[0]);
-
-    if (resultEnergiaEletricaRex) {
-      eletricalEnergyQuantity = resultEnergiaEletricaRex[1].split(' ')[6];
-      eletricalEnergyAmount = resultEnergiaEletricaRex[1].split(' ')[8];
-    }
-
-    const resultenergySCEEEICMSQuantity = energiaSCEERegex.exec(invoiceInfo[0]);
-    if (resultenergySCEEEICMSQuantity) {
-      energySCEEEICMSQuantity = resultenergySCEEEICMSQuantity[1].split(' ')[5];
-      energySCEEEICMSAmount = resultenergySCEEEICMSQuantity[1].split(' ')[7];
-    }
-
-    const resultenergiaCompensadaRegex = energiaCompensadaRegex.exec(invoiceInfo[0]);
-    if (resultenergiaCompensadaRegex) {
-      compensatedEnergyQuantity = resultenergiaCompensadaRegex[1].split(' ')[5];
-      compensatedEnergyAmount = resultenergiaCompensadaRegex[1].split(' ')[7];
-    }
-
-    const resultpublicLightingContribution = contribuicaoIlumPublicaRegex.exec(invoiceInfo[0]);
-    if (resultpublicLightingContribution) {
-      publicLightingContribution = resultpublicLightingContribution[1].split(' ')[0].replace('\n', '');
+      ({ name, document, numberClient, street, number, district, city, state, cep, monthReference } = this.extractClientDetails(clientData, 5));
     }
 
     return {
-      client: {
-        name,
-        document,
-        numberClient
-      },
+      name,
+      document,
+      numberClient,
       address: {
         street,
         number,
@@ -147,17 +41,61 @@ export class ExtractInfoService {
         city,
         state,
         cep,
-      },
-      invoice: {
-        monthReference,
-        eletricalEnergyQuantity,
-        eletricalEnergyAmount,
-        energySCEEEICMSQuantity,
-        energySCEEEICMSAmount,
-        compensatedEnergyQuantity,
-        compensatedEnergyAmount,
-        publicLightingContribution,
       }
+    }
+  }
+
+  private extractClientDetails(clientData: string[], offset: number) {
+    const regexNameClient = /^(.*?)\s+(\d+)$/;
+    const regexStreetAndNumber = /^(.*?)\s+(\d+)\s+(.*)$/;
+    const regexCepCityState = /^(\d{5}-\d{3})\s+(.+?),\s+([A-Z]{2})$/;
+    const regexMonthAndYear = /(\w+)\/(\d{4})/;
+
+    const resultNameClient = regexNameClient.exec(clientData[offset]);
+    const name = resultNameClient ? resultNameClient[1] : clientData[offset];
+    const document = resultNameClient ? resultNameClient[2] : clientData[offset + 4];
+    const numberClient = clientData[offset + 7]?.split(' ')[2] || '';
+    const district = clientData[offset + 2];
+
+    const resultStreetAndNumber = regexStreetAndNumber.exec(clientData[offset + 1]);
+    const street = resultStreetAndNumber ? resultStreetAndNumber[1] : '';
+    const number = resultStreetAndNumber ? resultStreetAndNumber[2] : '';
+
+    const resultCepCityState = regexCepCityState.exec(clientData[offset + 3]);
+    const cep = resultCepCityState ? resultCepCityState[1] : '';
+    const city = resultCepCityState ? resultCepCityState[2] : '';
+    const state = resultCepCityState ? resultCepCityState[3] : '';
+
+    const resultMonthAndYear = regexMonthAndYear.exec(clientData[2]);
+    const monthReference = resultMonthAndYear ? resultMonthAndYear[0] : '';
+
+    return { name, document, numberClient, street, number, district, city, state, cep, monthReference };
+  }
+
+  private extractInvoiceInfo(text: string, regex: RegExp) {
+    const invoiceInfo = regex.exec(text) || '';
+    const energiaEletricaRegex = /Energia Elétrica\s*([\s\S]*?)Energia SCEE s/;
+    const energiaSCEERegex = /Energia SCEE s\/ ICMS\s*([\s\S]*?)Energia compensada/;
+    const energiaCompensadaRegex = /Energia compensada GD I\s*([\s\S]*?)Contrib Ilum Publica Municipa/;
+    const contribuicaoIlumPublicaRegex = /Contrib Ilum Publica Municipal\s*([\s\S]*?)TOTAL/;
+
+    return {
+      eletricalEnergyQuantity: this.extractEnergyInfo(invoiceInfo, energiaEletricaRegex, 6),
+      eletricalEnergyAmount: this.extractEnergyInfo(invoiceInfo, energiaEletricaRegex, 8),
+      energySCEEEICMSQuantity: this.extractEnergyInfo(invoiceInfo, energiaSCEERegex, 5),
+      energySCEEEICMSAmount: this.extractEnergyInfo(invoiceInfo, energiaSCEERegex, 7),
+      compensatedEnergyQuantity: this.extractEnergyInfo(invoiceInfo, energiaCompensadaRegex, 5),
+      compensatedEnergyAmount: this.extractEnergyInfo(invoiceInfo, energiaCompensadaRegex, 7),
+      publicLightingContribution: this.extractEnergyInfo(invoiceInfo, contribuicaoIlumPublicaRegex, 0, true),
     };
+  }
+
+  private extractEnergyInfo(text: any, regex: RegExp, index: number, cleanLineBreak = false) {
+    const result = regex.exec(text);
+    if (result) {
+      const value = result[1].split(' ')[index];
+      return cleanLineBreak ? value.replace('\n', '') : value;
+    }
+    return '';
   }
 }
